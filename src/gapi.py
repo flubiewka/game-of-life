@@ -2,7 +2,7 @@ from tkinter import Frame, Tk
 from tkinter import ttk
 from src.engine import Engine
 
-COLORS = {"void": "#008000", "was_alive": "#003D00", "alive": "#FF0000"}
+COLORS = {"VOID": "#13a10e", "WAS_ALIVE": "#00af00", "ALIVE": "#c50f1f"}
 BLOCK_SIZE = 20
 
 
@@ -30,12 +30,12 @@ class Gapi(Engine):
 
     def __getColor(self, r: int, c: int) -> str:
         if self.is_alive(r, c):
-            color = COLORS["alive"]
+            color = COLORS["ALIVE"]
         else:
             if self.was_alive(r, c):
-                color = COLORS["was_alive"]
+                color = COLORS["WAS_ALIVE"]
             else:
-                color = COLORS["void"]
+                color = COLORS["VOID"]
         return color
 
     def __createWidgets(self):
