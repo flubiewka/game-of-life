@@ -46,8 +46,7 @@ class Engine:
                         row, col = int(coords[0]), int(coords[1])
                         self._arr[row][col].is_alive = True
 
-    def _analysis(self) -> None:
-
+    def __analysis(self) -> None:
         for row in range(self._nrows):
             for col in range(self._ncolumns):
                 self._old[row][col].is_alive = self._arr[row][col].is_alive
@@ -63,6 +62,9 @@ class Engine:
         for row in range(self._nrows):
             for col in range(self._ncolumns):
                 self._arr[row][col].is_alive = self._tmp[row][col].is_alive
+
+    def step(self) -> None:
+        self.__analysis()
 
     def _check_neighbours(self, cell_row: int, cell_col: int) -> int:
         nb_amount = 0

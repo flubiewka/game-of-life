@@ -4,13 +4,13 @@ ANSI = {
     # color reset
     "RESET": "\033[0m",
     # background
-    "B_BLACK": "\033[40m",
+    # "B_BLACK": "\033[40m",
     "B_RED": "\033[41m",
     "B_GREEN": "\033[42m",
     "B_DARK_GREEN": "\033[48;5;34m",
-    "B_YELLOW": "\033[43m",
-    "B_BLUE": "\033[44m",
-    "B_WHITE": "\033[47m",
+    # "B_YELLOW": "\033[43m",
+    # "B_BLUE": "\033[44m",
+    # "B_WHITE": "\033[47m",
     # cls
     "CLEAR_SCREEN": "\033[H\033[J",
     "CURSOR_HOME": "\033[H",
