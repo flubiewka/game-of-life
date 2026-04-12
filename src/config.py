@@ -1,7 +1,7 @@
-DATA_FILE_PATH = "data/test.txt"
+DATA_FILE_PATH = "data/data.txt"
 
 MODE_PROMPT = "which mode you want to enter: 1 - Gapi | 2 - Gtxt\n>> "
-FRAME_TARGET_SECONDS = 0.1
+FRAME_TARGET_SECONDS = 0.1  # 100ms
 
 GAPI_WINDOW_TITLE = "Game Of Life"
 GAPI_WINDOW_BG = "#333333"

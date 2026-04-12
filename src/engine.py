@@ -38,38 +38,7 @@ class Engine:
         for row, col in alive_cells:
             self._arr[row][col].is_alive = True
 
-    def __analysis(self) -> None:
-        for row in range(self._nrows):
-            for col in range(self._ncolumns):
-                self._old[row][col].is_alive = self._arr[row][col].is_alive
-                nb = self._check_neighbours(row, col)
-
-                if nb < 2 or nb > 3:
-                    self._tmp[row][col].is_alive = False
-                elif nb == 3:
-                    self._tmp[row][col].is_alive = True
-                else:
-                    self._tmp[row][col].is_alive = self._arr[row][col].is_alive
-
-        for row in range(self._nrows):
-            for col in range(self._ncolumns):
-                self._arr[row][col].is_alive = self._tmp[row][col].is_alive
-
-    def _check_neighbours(self, cell_row: int, cell_col: int) -> int:
-        nb_amount = 0
-        for row_index in range(-1, 2):
-            for col_index in range(-1, 2):
-                if row_index == 0 and col_index == 0:  # if indices == current cell
-                    continue
-
-                r = (cell_row + row_index) % self._nrows  #! main algorithm
-                c = (cell_col + col_index) % self._ncolumns
-
-                if self._arr[r][c].is_alive:
-                    nb_amount += 1
-        return nb_amount
-
-    #! public
+    # public API
 
     def step(self) -> None:
         self.__analysis()
@@ -82,3 +51,34 @@ class Engine:
 
     def was_alive(self, row: int, col: int) -> bool:
         return self._old[row][col].is_alive
+
+    def __analysis(self) -> None:
+        for row in range(self._nrows):
+            for col in range(self._ncolumns):
+                self._old[row][col].is_alive = self._arr[row][col].is_alive
+                nb = self.__check_neighbours(row, col)
+
+                if nb < 2 or nb > 3:
+                    self._tmp[row][col].is_alive = False
+                elif nb == 3:
+                    self._tmp[row][col].is_alive = True
+                else:
+                    self._tmp[row][col].is_alive = self._arr[row][col].is_alive
+
+        for row in range(self._nrows):
+            for col in range(self._ncolumns):
+                self._arr[row][col].is_alive = self._tmp[row][col].is_alive
+
+    def __check_neighbours(self, cell_row: int, cell_col: int) -> int:
+        nb_amount = 0
+        for row_index in range(-1, 2):
+            for col_index in range(-1, 2):
+                if row_index == 0 and col_index == 0:  # if indices == current cell
+                    continue
+
+                r = (cell_row + row_index) % self._nrows  #! main algorithm
+                c = (cell_col + col_index) % self._ncolumns
+
+                if self._arr[r][c].is_alive:
+                    nb_amount += 1
+        return nb_amount

@@ -15,6 +15,15 @@ class Game:
 
         self.__display.on_start()
 
+    def play(self):
+        try:
+            while True:
+                self.__tick(FRAME_TARGET_SECONDS)
+        except (KeyboardInterrupt, TclError):
+            print("\nGame has been stopped")
+        finally:
+            self.__display.on_stop()
+
     def __tick(self, target_time: float):
         """
         needed this function because there was difference in frame time with different render modes
@@ -26,6 +35,10 @@ class Game:
         vresion 2.0: - difference is negligible, no need for this function anymore
         Gtxt frametime: min - 2ms, max - 3ms.
         Gapi frametime: min - 5ms, max - 8ms.
+
+        version 3.0: - canvas instead of frames fixed lags on start and stop
+        Gtxt frametime: min - 2ms, max - 3ms.
+        Gapi frametime: min - 4ms, max - 10ms.
         =============================================
         """
         frame_started = perf_counter()
@@ -38,12 +51,3 @@ class Game:
         frame_time_remained = target_time - frame_spent
         if frame_time_remained > 0:
             sleep(frame_time_remained)
-
-    def play(self):
-        try:
-            while True:
-                self.__tick(FRAME_TARGET_SECONDS)
-        except (KeyboardInterrupt, TclError):
-            print("\nGame has been stopped")
-        finally:
-            self.__display.on_stop()

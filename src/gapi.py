@@ -1,5 +1,4 @@
-from tkinter import Frame, Tk
-from tkinter import ttk
+from tkinter import Canvas, TclError, Tk
 from src.config import GAPI_BLOCK_SIZE, GAPI_COLORS, GAPI_WINDOW_BG, GAPI_WINDOW_TITLE
 from src.engine import Engine
 
@@ -11,31 +10,64 @@ class Gapi(Engine):
         self.__window.title(GAPI_WINDOW_TITLE)
         self.__window.config(bg=GAPI_WINDOW_BG)
 
-        self.__playground = ttk.Frame(self.__window)
-        self.__playground.pack(expand=True, padx=10, pady=10)
-
         self.__rows, self.__cols = self.get_dimensions()
-        self.__cells: list[list[Frame]] = []
+        canvas_width = self.__cols * GAPI_BLOCK_SIZE
+        canvas_height = self.__rows * GAPI_BLOCK_SIZE
+        self.__canvas = Canvas(
+            self.__window,
+            width=canvas_width,
+            height=canvas_height,
+            bg=GAPI_WINDOW_BG,
+            highlightthickness=0,
+        )
+        self.__canvas.pack(expand=True, padx=10, pady=10)
+
+        self.__cells: list[list[int]] = []
+        self.__cell_colors: list[list[str]] = []
         self.__create_widgets()
 
     def on_start(self) -> None:
         return
 
     def on_stop(self) -> None:
-        self.__window.destroy()
+        try:
+            self.__window.destroy()
+        except TclError:
+            pass
 
     def view(self):
         for r in range(self.__rows):
             for c in range(self.__cols):
                 bg_color = self.__get_color(r, c)
-                if bg_color != self.__get_current_cell_color(r, c):
-                    self.__cells[r][c].config(bg=bg_color)
+                if bg_color != self.__cell_colors[r][c]:
+                    self.__canvas.itemconfig(self.__cells[r][c], fill=bg_color)
+                    self.__cell_colors[r][c] = bg_color
 
         self.__window.update_idletasks()  # updates screen
         self.__window.update()
 
-    def __get_current_cell_color(self, r: int, c: int) -> str:
-        return str(self.__cells[r][c].cget("bg"))
+    def __create_widgets(self):
+        for r in range(self.__rows):
+            line: list[int] = []
+            color_line: list[str] = []
+            for c in range(self.__cols):
+                color = GAPI_COLORS["VOID"]
+                x1 = c * GAPI_BLOCK_SIZE
+                y1 = r * GAPI_BLOCK_SIZE
+                x2 = x1 + GAPI_BLOCK_SIZE
+                y2 = y1 + GAPI_BLOCK_SIZE
+                rect_id = self.__canvas.create_rectangle(
+                    x1,
+                    y1,
+                    x2,
+                    y2,
+                    fill=color,
+                    outline="",
+                )
+                line.append(rect_id)
+                color_line.append(color)
+            self.__cells.append(line)
+            self.__cell_colors.append(color_line)
 
     def __get_color(self, r: int, c: int) -> str:
         if self.is_alive(r, c):
@@ -46,18 +78,3 @@ class Gapi(Engine):
             else:
                 color = GAPI_COLORS["VOID"]
         return color
-
-    def __create_widgets(self):
-        for r in range(self.__rows):
-            line: list[Frame] = []
-            for c in range(self.__cols):
-                frm = Frame(
-                    self.__playground,
-                    width=GAPI_BLOCK_SIZE,
-                    height=GAPI_BLOCK_SIZE,
-                    bg=GAPI_COLORS["VOID"],
-                )
-                frm.pack_propagate(False)
-                frm.grid(row=r, column=c)
-                line.append(frm)
-            self.__cells.append(line)
