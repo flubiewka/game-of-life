@@ -1,29 +1,49 @@
-import time
+from time import sleep, perf_counter
 from tkinter import TclError
-from src.gtxt import Gtxt, ANSI
+from src.config import FRAME_TARGET_SECONDS, MODE_PROMPT
+from src.display import Display
 from src.gapi import Gapi
+from src.gtxt import Gtxt
 
 
 class Game:
     def __init__(self):
-        while (
-            a := input("which mode you want to enter: 1 - Gapi | 2 - Gtxt\n>> ")
-        ) not in ("1", "2"):
+        self.__display: Display
+        while (mode := input(MODE_PROMPT)) not in ("1", "2"):
             pass
-        if a == "1":
-            self.__display = Gapi()
-        else:
-            self.__display = Gtxt()
-            print(ANSI["ENTER_ALT_SCREEN"] + ANSI["HIDE_CURSOR"], end="", flush=True)
+        self.__display = Gapi() if mode == "1" else Gtxt()
+
+        self.__display.on_start()
+
+    def __tick(self, target_time: float):
+        """
+        needed this function because there was difference in frame time with different render modes
+
+        vresion 1.0:
+        Gtxt frametime: min - 2ms, max - 5ms.
+        Gapi frametime: min - 57ms, max - 167ms.
+
+        vresion 2.0: - difference is negligible, no need for this function anymore
+        Gtxt frametime: min - 2ms, max - 3ms.
+        Gapi frametime: min - 5ms, max - 8ms.
+        =============================================
+        """
+        frame_started = perf_counter()
+
+        self.__display.view()
+        self.__display.step()
+
+        frame_spent = perf_counter() - frame_started
+
+        frame_time_remained = target_time - frame_spent
+        if frame_time_remained > 0:
+            sleep(frame_time_remained)
 
     def play(self):
         try:
             while True:
-                self.__display.view()
-                self.__display.step()
-                time.sleep(0.1)  # 0.1 = 10fps
+                self.__tick(FRAME_TARGET_SECONDS)
         except (KeyboardInterrupt, TclError):
             print("\nGame has been stopped")
         finally:
-            if isinstance(self.__display, Gtxt):
-                print(ANSI["SHOW_CURSOR"] + ANSI["EXIT_ALT_SCREEN"], end="", flush=True)
+            self.__display.on_stop()
