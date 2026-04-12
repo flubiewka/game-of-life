@@ -6,6 +6,7 @@ from src.engine import Engine
 class Gapi(Engine):
     def __init__(self):
         super().__init__()
+        # Tk window is created once and reused every frame.
         self.__window = Tk()
         self.__window.title(GAPI_WINDOW_TITLE)
         self.__window.config(bg=GAPI_WINDOW_BG)
@@ -23,7 +24,8 @@ class Gapi(Engine):
         self.__canvas.pack(expand=True, padx=10, pady=10)
 
         self.__cells: list[list[int]] = []
-        self.__cell_colors: list[list[str]] = []
+        # Keep last painted color to avoid unnecessary canvas updates.
+        self.__cell_colors_cache: list[list[str]] = []
         self.__create_widgets()
 
     def on_start(self) -> None:
@@ -39,19 +41,21 @@ class Gapi(Engine):
         for r in range(self.__rows):
             for c in range(self.__cols):
                 bg_color = self.__get_color(r, c)
-                if bg_color != self.__cell_colors[r][c]:
+                # Repaint only changed cells to reduce redraw cost.
+                if bg_color != self.__cell_colors_cache[r][c]:
                     self.__canvas.itemconfig(self.__cells[r][c], fill=bg_color)
-                    self.__cell_colors[r][c] = bg_color
+                    self.__cell_colors_cache[r][c] = bg_color
 
         self.__window.update_idletasks()  # updates screen
         self.__window.update()
 
     def __create_widgets(self):
         for r in range(self.__rows):
-            line: list[int] = []
-            color_line: list[str] = []
+            row_cells: list[int] = []
+            row_colors: list[str] = []
             for c in range(self.__cols):
                 color = GAPI_COLORS["VOID"]
+                # Convert grid coordinates to canvas pixel rectangle.
                 x1 = c * GAPI_BLOCK_SIZE
                 y1 = r * GAPI_BLOCK_SIZE
                 x2 = x1 + GAPI_BLOCK_SIZE
@@ -64,10 +68,10 @@ class Gapi(Engine):
                     fill=color,
                     outline="",
                 )
-                line.append(rect_id)
-                color_line.append(color)
-            self.__cells.append(line)
-            self.__cell_colors.append(color_line)
+                row_cells.append(rect_id)
+                row_colors.append(color)
+            self.__cells.append(row_cells)
+            self.__cell_colors_cache.append(row_colors)
 
     def __get_color(self, r: int, c: int) -> str:
         if self.is_alive(r, c):

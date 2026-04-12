@@ -4,12 +4,14 @@ from src.engine import Engine
 
 class Gtxt(Engine):
     def on_start(self) -> None:
+        # Switch to alternate screen buffer for clean animation.
         print(ANSI["ENTER_ALT_SCREEN"] + ANSI["HIDE_CURSOR"], end="", flush=True)
 
     def on_stop(self) -> None:
         print(ANSI["SHOW_CURSOR"] + ANSI["EXIT_ALT_SCREEN"], end="", flush=True)
 
     def view(self) -> None:
+        # Redraw from top-left without clearing terminal history.
         print(ANSI["CURSOR_HOME"], end="")
 
         rows, cols = self.get_dimensions()
@@ -26,6 +28,7 @@ class Gtxt(Engine):
                     else:
                         color = ANSI["B_GREEN"]
                 line.append(f"{color}  ")
+            # Reset color at line end to keep terminal state sane.
             full_field.append("".join(line) + ANSI["RESET"])
 
         print("\n".join(full_field), flush=True)

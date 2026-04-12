@@ -9,6 +9,7 @@ from src.gtxt import Gtxt
 class Game:
     def __init__(self):
         self.__display: Display
+        # Keep asking until user chooses a supported mode.
         while (mode := input(MODE_PROMPT)) not in ("1", "2"):
             pass
         self.__display = Gapi() if mode == "1" else Gtxt()
@@ -17,6 +18,7 @@ class Game:
 
     def play(self):
         try:
+            # Endless simulation loop; timing is handled in __tick.
             while True:
                 self.__tick(FRAME_TARGET_SECONDS)
         except (KeyboardInterrupt, TclError):
@@ -48,6 +50,7 @@ class Game:
 
         frame_spent = perf_counter() - frame_started
 
+        # Sleep only when frame work finished faster than target.
         frame_time_remained = target_time - frame_spent
         if frame_time_remained > 0:
             sleep(frame_time_remained)
