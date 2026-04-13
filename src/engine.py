@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from src.seed_loader import load_seed
 
 
@@ -11,7 +12,6 @@ class Cell:
 
 class Engine:
     def __init__(self):
-        # Seed loader returns: rows, columns, and coordinates of alive cells.
         self._nrows, self._ncolumns, alive_cells = load_seed()
 
         self._current_grid = [  # creates "dead" array with dimensions above
@@ -56,7 +56,7 @@ class Engine:
     def __analysis(self) -> None:
         for row in range(self._nrows):
             for col in range(self._ncolumns):
-                # Preserve previous generation for trail rendering.
+                # previous generation for trail.
                 self._previous_grid[row][col].is_alive = self._current_grid[row][
                     col
                 ].is_alive
@@ -73,7 +73,7 @@ class Engine:
 
         for row in range(self._nrows):
             for col in range(self._ncolumns):
-                # Apply next generation in one pass after all decisions are made.
+                # next generation after all decisions are made.
                 self._current_grid[row][col].is_alive = self._next_grid[row][
                     col
                 ].is_alive
@@ -87,7 +87,7 @@ class Engine:
 
                 neighbour_row = (cell_row + row_index) % self._nrows  #! main algorithm
                 neighbour_col = (cell_col + col_index) % self._ncolumns
-                # Modulo wraps coordinates and makes field edges connected.
+                # Modulo makes field edges connected.
 
                 if self._current_grid[neighbour_row][neighbour_col].is_alive:
                     alive_neighbour_count += 1

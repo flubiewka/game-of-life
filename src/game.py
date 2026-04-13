@@ -1,18 +1,21 @@
-from time import sleep, perf_counter
+from time import perf_counter, sleep
 from tkinter import TclError
+
 from src.config import FRAME_TARGET_SECONDS, MODE_PROMPT
 from src.display import Display
+from src.engine import Engine
 from src.gapi import Gapi
 from src.gtxt import Gtxt
 
 
 class Game:
     def __init__(self):
+        self.__engine = Engine()
         self.__display: Display
-        # Keep asking until user chooses a supported mode.
+        # mode choosing
         while (mode := input(MODE_PROMPT)) not in ("1", "2"):
             pass
-        self.__display = Gapi() if mode == "1" else Gtxt()
+        self.__display = Gapi(self.__engine) if mode == "1" else Gtxt(self.__engine)
 
         self.__display.on_start()
 
@@ -45,12 +48,12 @@ class Game:
         """
         frame_started = perf_counter()
 
+        self.__engine.step()
         self.__display.view()
-        self.__display.step()
 
         frame_spent = perf_counter() - frame_started
 
-        # Sleep only when frame work finished faster than target.
+        # Sleep when frame work finished faster.
         frame_time_remained = target_time - frame_spent
         if frame_time_remained > 0:
             sleep(frame_time_remained)

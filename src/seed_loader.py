@@ -7,7 +7,7 @@ def load_seed(path: str = DATA_FILE_PATH) -> tuple[int, int, list[tuple[int, int
         if len(dimensions_tokens) < 2:
             raise ValueError("First line must contain two integers: columns and rows")
 
-        # abs() keeps parser tolerant to accidental negative values in file.
+        # abs() if values are negative
         ncolumns = abs(int(dimensions_tokens[0]))
         nrows = abs(int(dimensions_tokens[1]))
         if ncolumns == 0 or nrows == 0:
@@ -20,7 +20,7 @@ def load_seed(path: str = DATA_FILE_PATH) -> tuple[int, int, list[tuple[int, int
         alive_cells_count = int(alive_count_line)
         if alive_cells_count < 0:
             raise ValueError("Alive cells count must be non-negative")
-        # Hard guard: amount of alive cells cannot exceed grid capacity.
+        # amount of alive cells cannot exceed grid capacity.
         if alive_cells_count > nrows * ncolumns:
             raise ValueError("Alive cells count cannot exceed grid area")
 
@@ -31,7 +31,7 @@ def load_seed(path: str = DATA_FILE_PATH) -> tuple[int, int, list[tuple[int, int
                 raise ValueError(f"Alive cell line {i + 3} must contain row and column")
 
             row, col = int(coords[0]), int(coords[1])
-            # Validate coordinates before adding them to initial seed.
+            # Validate coordinates before adding them
             if not (0 <= row < nrows and 0 <= col < ncolumns):
                 raise ValueError(
                     f"Alive cell ({row}, {col}) is out of bounds for grid {nrows}x{ncolumns}"

@@ -2,7 +2,10 @@ from src.config import ANSI
 from src.engine import Engine
 
 
-class Gtxt(Engine):
+class Gtxt:
+    def __init__(self, engine: Engine):
+        self.__engine = engine
+
     def on_start(self) -> None:
         # Switch to alternate screen buffer for clean animation.
         print(ANSI["ENTER_ALT_SCREEN"] + ANSI["HIDE_CURSOR"], end="", flush=True)
@@ -14,16 +17,16 @@ class Gtxt(Engine):
         # Redraw from top-left without clearing terminal history.
         print(ANSI["CURSOR_HOME"], end="")
 
-        rows, cols = self.get_dimensions()
+        rows, cols = self.__engine.get_dimensions()
         full_field: list[str] = []
 
         for r in range(rows):
             line: list[str] = []
             for c in range(cols):
-                if self.is_alive(r, c):
+                if self.__engine.is_alive(r, c):
                     color = ANSI["B_RED"]
                 else:
-                    if self.was_alive(r, c):
+                    if self.__engine.was_alive(r, c):
                         color = ANSI["B_DARK_GREEN"]
                     else:
                         color = ANSI["B_GREEN"]
